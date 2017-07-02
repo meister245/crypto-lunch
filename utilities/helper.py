@@ -17,5 +17,8 @@ class Util:
 
     @staticmethod
     def read_json(filename):
-        with open(filename, 'r') as f:
-            return json.load(f)
+        try:
+            with open(filename, 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return dict()
