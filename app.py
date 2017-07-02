@@ -1,12 +1,12 @@
 import argparse
 
-from modules.db_manager import DBManager
+from modules.data_manager import DataManager
 
 
 class App:
     def __init__(self):
         self.args = vars(self.parse_args())
-        self.db = DBManager()
+        self.db = DataManager()
 
     def parse_args(self):
         parser = argparse.ArgumentParser()
