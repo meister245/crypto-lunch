@@ -16,7 +16,7 @@ class WebScraper:
 
     def get_exchange_names(self):
         """ scrape exchange names from CryptoCompare """
-        cx_names = []
+        cx_names = {"exchanges": []}
 
         # initialize selenium driver
         url = "https://www.cryptocompare.com/exchanges/#/overview"
@@ -34,10 +34,12 @@ class WebScraper:
                 "/html/body/div[1]/div[3]/div/div/div/exchange-list/div/div/div[2]/header/h3/a// text()")
 
         for n in exchange_names:
-            cx_names.append(n.strip('.'))
+            cx_names['exchanges'].append(n.strip('.'))
 
         driver.close()
-        return sorted(cx_names)
+
+        sorted(cx_names['exchanges'])
+        return cx_names
 
     def get_exchange_trade_pairs(self, cx_name, cx_pairs):
         """ scrape exchange tsyms from CryptoCompare """

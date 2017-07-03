@@ -10,17 +10,20 @@ class App:
 
     def parse_args(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument('--db_reset', action='store_true', help='reset current database')
+        parser.add_argument('--db_create', action='store_true', help='generate new json database')
         parser.add_argument('--db_update_names', action='store_true', help='update exchange names')
         parser.add_argument('--db_update_pairs', action='store', type=str, help='update exchange pairs')
+        parser.add_argument('--db_reset', action='store_true', help='reset to empty json database')
         return parser.parse_args()
 
 
 if __name__ == '__main__':
     app = App()
 
-    if app.args['db_reset']:
+    if app.args['db_create']:
         app.db.create_json_data()
+    elif app.args['db_reset']:
+        app.db.reset_json_data()
     else:
         if app.args['db_update_names']:
             app.db.update_json_data('names')

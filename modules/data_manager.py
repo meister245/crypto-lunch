@@ -10,39 +10,62 @@ class DataManager:
         self.scraper = WebScraper()
 
     def create_json_data(self):
-        """ get exchange names and associated trade pairs and write them to JSON """
-        self.cx_names = self.scraper.get_exchange_names()
-        self.cx_pairs = {}
+        s = Util.get_current_time()
+        self.reset_json_data()
 
-        for name in self.cx_names:
+        # get exchange names and store them
+        self.cx_names = self.scraper.get_exchange_names()
+        self.write_json_data(self.cx_names, FILE_CXNAMES)
+
+        # get exchange trading pairs and store them
+        for name in self.cx_names['exchanges']:
             self.cx_pairs[name] = self.scraper.get_exchange_trade_pairs(name, self.cx_pairs)
 
-        self.write_json(self.cx_names, FILE_CXNAMES)
-        self.write_json(self.cx_pairs, FILE_CXPAIRS)
+        self.write_json_data(self.cx_pairs, FILE_CXPAIRS)
+
+        print("#### INFO: Database created successfully)")
+        print("#### INFO: Duration - %s minutes" % str(Util.get_current_time() - s / 60)[1:4])
 
         return
 
     def update_json_data(self, *args):
-        """ update existing JSON files """
+        """ update existing JSON data / create JSON data with selected exchanges """
 
         if args[0] == 'names':
             self.cx_names = self.scraper.get_exchange_names()
-            self.write_json(self.cx_names, FILE_CXNAMES)
+            self.write_json_data(self.cx_names, FILE_CXNAMES)
+            print("#### INFO: Updated exchange names")
 
         if args[0] == 'pairs':
-            self.cx_names = self.read_json(FILE_CXNAMES)
-            self.cx_pairs = self.read_json(FILE_CXPAIRS)
+            self.cx_names = self.read_json_data(FILE_CXNAMES)
+            self.cx_pairs = self.read_json_data(FILE_CXPAIRS)
 
-            for name in self.cx_names:
-                if name.lower() in args[1]:
-                    self.cx_pairs[name] = self.scraper.get_exchange_trade_pairs(name, self.cx_pairs)
+            if self.cx_names == {}:
+                self.update_json_data('names')
 
-            self.write_json(self.cx_pairs, FILE_CXPAIRS)
+            for arg in args[1]:
+                for idx, name in enumerate(self.cx_names['exchanges']):
+                    if arg == name.lower():
+                        self.cx_pairs[name] = self.scraper.get_exchange_trade_pairs(name, self.cx_pairs)
+                        print("#### INFO: Updated trade pairs for '%s'" % name)
+                        break
+                    elif idx + 1 == len(self.cx_names['exchanges']):
+                        print("#### WARNING: No exchange name value '%s' exists in json database" % arg)
+
+            self.write_json_data(self.cx_pairs, FILE_CXPAIRS)
 
         return
 
-    def write_json(self, data, path):
+    def write_json_data(self, data, path):
         return Util.write_json_to_file(data, path)
 
-    def read_json(self, path):
+    def read_json_data(self, path):
         return Util.read_json(path)
+
+    def reset_json_data(self):
+        file_paths = [FILE_CXNAMES, FILE_CXPAIRS]
+
+        for p in file_paths:
+            Util.check_path(p)
+
+        return [self.write_json_data({}, p) for p in file_paths]
