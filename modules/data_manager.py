@@ -10,8 +10,10 @@ class DataManager:
         self.scraper = WebScraper()
 
     def create_json_data(self):
-        s = Util.get_current_time()
         self.reset_json_data()
+        self.cx_pairs = {}
+
+        s = Util.get_current_time()
 
         # get exchange names and store them
         self.cx_names = self.scraper.get_exchange_names()
