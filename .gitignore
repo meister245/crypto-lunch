@@ -1,5 +1,6 @@
 # folders
 .idea/
+data/
 
 # file extensions
 *.pyc
