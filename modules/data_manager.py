@@ -26,7 +26,7 @@ class DataManager:
         self.write_json_data(self.cx_pairs, FILE_CXPAIRS)
 
         print("#### INFO: Database created successfully)")
-        print("#### INFO: Duration - %s minutes" % str(Util.get_current_time() - s / 60)[1:4])
+        print("#### INFO: Duration - %s minutes" % str((Util.get_current_time() - s) / 60)[:4])
 
         return
 

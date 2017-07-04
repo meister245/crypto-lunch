@@ -38,4 +38,4 @@ class Util:
 
     @staticmethod
     def get_current_time():
-        return time.localtime()
+        return time.time()
