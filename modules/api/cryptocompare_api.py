@@ -1,7 +1,7 @@
 import requests
 
-URL_COIN = 'https://www.cryptocompare.com/api/data/coinlist/'
-URL_PRICE = 'https://min-api.cryptocompare.com/data/'
+URL_COIN = 'https://www.cryptocompare.com/api/json/coinlist/'
+URL_PRICE = 'https://min-api.cryptocompare.com/json/'
 
 
 class CryptoCompareAPI:

@@ -1,6 +1,6 @@
 import argparse
 
-from modules.data_manager import DataManager
+from modules.data.manager import DataManager
 
 
 class App:
