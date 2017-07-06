@@ -1,7 +1,7 @@
+import time
+from lxml import html
 from selenium.common import exceptions
 from selenium import webdriver
-from lxml import html
-import time
 
 CHROMEDRIVER_PATH = 'utilities/chromedriver'
 
@@ -38,7 +38,7 @@ class WebScraper:
 
         driver.close()
 
-        sorted(cx_names['exchanges'])
+        cx_names['exchanges'] = sorted(cx_names['exchanges'])
         return cx_names
 
     def get_exchange_trade_pairs(self, cx_name, cx_pairs):
@@ -75,6 +75,10 @@ class WebScraper:
             time.sleep(0.5)
         except exceptions.ElementNotVisibleException:
             pass
+        except exceptions.NoSuchElementException:
+            driver.refresh()
+            driver.find_element_by_class_name('btn-more-forum').click()
+            time.sleep(0.5)
 
         tree = html.fromstring(driver.page_source)
         trade_pairs = \
