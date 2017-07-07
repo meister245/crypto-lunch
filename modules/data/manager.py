@@ -1,13 +1,16 @@
 from modules.data.webscraper import WebScraper
+from modules.data.routes import TradeRoutes
 from utilities.helper import Util
 
 
 class DataManager:
     def __init__(self):
         self.scraper = WebScraper()
+        self.routes = TradeRoutes()
         self.util = Util()
 
     def create_json_data(self):
+        """ create JSON database files """
         self.reset_json_data()
         self.cx_pairs = {}
 
@@ -23,19 +26,25 @@ class DataManager:
 
         self.util.write_json_to_file(self.cx_pairs, self.util.FILE_CXPAIRS)
 
+        # generate arbitrage routes between exchanges
+        data = self.routes.get_arbitrage_routes()
+        self.util.write_json_to_file(data, self.util.FILE_ROUTES)
+
         print("#### INFO: Database created successfully)")
         print("#### INFO: Duration - %s minutes" % str((self.util.get_current_time() - s) / 60)[:4])
 
         return
 
     def update_json_data(self, *args):
-        """ update existing JSON json / create JSON json with selected exchanges """
+        """ create or update existing JSON database files """
 
+        # update exchange names file
         if args[0] == 'names':
             self.cx_names = self.scraper.get_exchange_names()
             self.util.write_json_to_file(self.cx_names, self.util.FILE_CXNAMES)
             print("#### INFO: Updated exchange names")
 
+        # update exchange trading pairs file
         if args[0] == 'pairs':
             self.cx_names = self.util.read_json(self.util.FILE_CXNAMES)
             self.cx_pairs = self.util.read_json(self.util.FILE_CXPAIRS)
@@ -54,10 +63,17 @@ class DataManager:
 
             self.util.write_json_to_file(self.cx_pairs, self.util.FILE_CXPAIRS)
 
+        # update exchange arbitrage routes file
+        if args[0] == 'routes':
+            data = self.routes.get_arbitrage_routes()
+            self.util.write_json_to_file(data, self.util.FILE_ROUTES)
+            print("#### INFO: Generated arbitrage routes")
+
         return
 
     def reset_json_data(self):
-        file_paths = [self.util.FILE_CXNAMES, self.util.FILE_CXPAIRS]
+        """ reset JSON database files """
+        file_paths = [self.util.FILE_CXNAMES, self.util.FILE_CXPAIRS, self.util.FILE_ROUTES]
 
         for p in file_paths:
             self.util.check_path(p)

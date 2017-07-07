@@ -7,7 +7,7 @@ class Util:
     def __init__(self):
         self.FILE_CXNAMES = 'json/cx_names.json'
         self.FILE_CXPAIRS = 'json/cx_pairs.json'
-        self.FILE_ROUTES = 'json/ar_routes.json'
+        self.FILE_ROUTES = 'json/cx_routes.json'
 
     @staticmethod
     def read_file(filename):
