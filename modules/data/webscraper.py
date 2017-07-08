@@ -14,33 +14,6 @@ class WebScraper:
         url = "https://www.cryptocompare.com/exchanges/%s/overview/" % exchange_name.lower()
         return url + tsym if len(tsym) != 0 else url
 
-    def get_exchange_names(self):
-        """ scrape exchange names from CryptoCompare """
-        cx_names = {"exchanges": []}
-
-        # initialize selenium driver
-        url = "https://www.cryptocompare.com/exchanges/#/overview"
-        driver = webdriver.Chrome(CHROMEDRIVER_PATH)
-        driver.get(url)
-
-        # scroll to bottom of the page, so all exchanges will load
-        driver.execute_script("document.body.scrollTop = document.body.scrollHeight;")
-        time.sleep(0.5)
-
-        # get exchange names and store them
-        tree = html.fromstring(driver.page_source)
-        exchange_names = \
-            tree.xpath(
-                "/html/body/div[1]/div[3]/div/div/div/exchange-list/div/div/div[2]/header/h3/a// text()")
-
-        for n in exchange_names:
-            cx_names['exchanges'].append(n.strip('.'))
-
-        driver.close()
-
-        cx_names['exchanges'] = sorted(cx_names['exchanges'])
-        return cx_names
-
     def get_exchange_trade_pairs(self, cx_name, cx_pairs):
         """ scrape exchange tsyms from CryptoCompare """
         cx_pairs[cx_name] = {}
