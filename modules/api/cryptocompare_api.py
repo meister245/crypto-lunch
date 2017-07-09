@@ -1,6 +1,7 @@
 import requests
 
-URL_COIN = 'https://www.cryptocompare.com/api/json/coinlist/'
+URL_COIN = 'https://www.cryptocompare.com/api/data/coinlist/'
+URL_EXCHANGES = 'https://min-api.cryptocompare.com/data/all/exchanges'
 URL_PRICE = 'https://min-api.cryptocompare.com/data/'
 URL_SNAPSHOT = 'https://www.cryptocompare.com/api/data/'
 
@@ -28,8 +29,14 @@ class CryptoCompareAPI:
 
             return requests.get(URL_PRICE + method + '?' + "&".join(url_params))
 
+        if method in ['exchanges']:
+            return requests.get(URL_EXCHANGES)
+
     def get_coinlist(self):
         return self.api_query('coinlist').json()
+
+    def get_exchange_pairs(self):
+        return self.api_query('exchanges').json()
 
     def get_price(self, params):
         return self.api_query('price', **params).json()
