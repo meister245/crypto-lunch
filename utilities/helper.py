@@ -37,7 +37,3 @@ class Util:
         if not os.path.exists(p):
             with open(p, 'w') as f:
                 return json.dump({}, f)
-
-    @staticmethod
-    def get_current_time():
-        return time.time()

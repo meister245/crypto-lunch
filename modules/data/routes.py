@@ -53,23 +53,27 @@ class TradeRoutes:
                     current_routes.append(route)
 
                 # intermediary trading pair on target exchange to bridge between market trading pairs
-                if (sym_pair[0] not in tsym_pair and sym_pair[1] in tsym_pair):
+                if (sym_pair[0] in tsym_pair and sym_pair[1] not in tsym_pair):
                     for itsym_pair in trgt_markets:  # intermediary on target exchange
                         if itsym_pair != tsym_pair and itsym_pair != sym_pair:
                             if itsym_pair[0] in sym_pair and itsym_pair[0] not in tsym_pair and itsym_pair[1] not in sym_pair and itsym_pair[1] in tsym_pair:
-                                current_routes.append(self.generate_route(sym_pair, tsym_pair, "target_intermediary", itsym_pair,itsym_pair[1]))
+                                current_routes.append(self.generate_route(sym_pair, tsym_pair, "target_intermediary", itsym_pair, self.get_helper_sym(sym_pair, tsym_pair)))
                             if itsym_pair[0] not in sym_pair and itsym_pair[0] in tsym_pair and itsym_pair[1] in sym_pair and itsym_pair[1] not in tsym_pair:
-                                current_routes.append(self.generate_route(sym_pair, tsym_pair, "target_intermediary", itsym_pair,itsym_pair[1]))
+                                current_routes.append(self.generate_route(sym_pair, tsym_pair, "target_intermediary", itsym_pair, self.get_helper_sym(sym_pair, tsym_pair)))
 
-                if (sym_pair[0] not in tsym_pair and sym_pair[1] in tsym_pair):
+                if (sym_pair[0] in tsym_pair and sym_pair[1] not in tsym_pair):
                     for isym_pair in src_markets:  # intermediary on source exchange
                         if isym_pair != sym_pair and isym_pair != tsym_pair:
                             if isym_pair[0] in sym_pair and isym_pair[0] not in tsym_pair and isym_pair[1] not in sym_pair and isym_pair[1] in tsym_pair:
-                                current_routes.append(self.generate_route(sym_pair, tsym_pair, "source_intermediary", isym_pair,isym_pair[0]))
+                                current_routes.append(self.generate_route(sym_pair, tsym_pair, "source_intermediary", isym_pair, self.get_helper_sym(sym_pair, tsym_pair)))
                             if isym_pair[0] not in sym_pair and isym_pair[0] in tsym_pair and isym_pair[1] in sym_pair and isym_pair[1] not in tsym_pair:
-                                current_routes.append(self.generate_route(sym_pair, tsym_pair, "source_intermediary", isym_pair,isym_pair[0]))
+                                current_routes.append(self.generate_route(sym_pair, tsym_pair, "source_intermediary", isym_pair, self.get_helper_sym(sym_pair, tsym_pair)))
 
         if len(current_routes) != 0:
             exchange_pair = src_exchange + "-" + trgt_exchange
             self.routes[exchange_pair] = current_routes
 
+    def get_helper_sym(self, source_pair, target_pair):
+        for sym in target_pair:
+            if sym not in source_pair:
+                return sym
