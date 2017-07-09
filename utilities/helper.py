@@ -8,6 +8,7 @@ class Util:
         self.FILE_CONFIG = 'config.json'
         self.FILE_CXPAIRS = 'json/cx_pairs.json'
         self.FILE_ROUTES = 'json/cx_routes.json'
+        self.FILE_PROFIT = 'json/cx_profit.json'
 
     @staticmethod
     def read_file(filename):
