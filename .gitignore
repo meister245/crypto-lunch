@@ -4,6 +4,3 @@ json/
 
 # file extensions
 *.pyc
-
-# files
-utilities/chromedriver.exe

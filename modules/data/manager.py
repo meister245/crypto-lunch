@@ -1,78 +1,47 @@
-from modules.data.webscraper import WebScraper
 from modules.data.routes import TradeRoutes
+from modules.data.pairs import TradePairs
 from utilities.helper import Util
 
 
 class DataManager:
     def __init__(self):
-        self.scraper = WebScraper()
-        self.routes = TradeRoutes()
         self.util = Util()
 
-    def create_json_data(self):
-        """ create JSON database files """
-        self.reset_json_data()
-        self.cx_pairs = {}
+    def get_cx_names(self):
+        """ generate exchange names """
+        self.pairs = TradePairs()
 
-        s = self.util.get_current_time()
+        self.cx_names = {"exchanges": self.pairs.get_exchange_names()}
+        self.util.write_json_to_file(self.cx_names, self.util.FILE_NAMES)
 
-        # get exchange names
-        self.cx_names = self.util.read_json(self.util.FILE_CONFIG)
+        print("#### INFO: Generated exchange names")
+        return
 
-        # get exchange trading pairs and store them
-        for name in self.cx_names['exchanges']:
-            self.cx_pairs[name] = self.scraper.get_exchange_trade_pairs(name, self.cx_pairs)
+    def create_cx_pairs(self):
+        """ generate exchange trading pairs """
+        self.pairs = TradePairs()
 
-        self.util.write_json_to_file(self.cx_pairs, self.util.FILE_CXPAIRS)
+        self.cx_pairs = self.pairs.get_trade_pairs()
+        self.util.write_json_to_file(self.cx_pairs, self.util.FILE_PAIRS)
 
-        # generate arbitrage routes between exchanges
+        print("#### INFO: Generated exchange trading pairs")
+        return
+
+    def create_cx_routes(self):
+        """ generate arbitrage routes between exchanges """
+        self.routes = TradeRoutes()
+
         data = self.routes.get_arbitrage_routes()
         self.util.write_json_to_file(data, self.util.FILE_ROUTES)
 
-        print("#### INFO: JSON databases created successfully)")
-        print("#### INFO: Duration - %s minutes" % str((self.util.get_current_time() - s) / 60)[:4])
-
-        return
-
-    def update_json_data(self, *args):
-        """ create or update existing JSON database files """
-
-        # update exchange trading pairs file
-        if args[0] == 'pairs':
-            self.cx_names = self.util.read_json(self.util.FILE_CONFIG)
-            self.cx_pairs = self.util.read_json(self.util.FILE_CXPAIRS)
-
-            if self.cx_names == {}:
-                self.update_json_data('names')
-
-            for arg in args[1]:
-                for idx, name in enumerate(self.cx_names['exchanges']):
-                    if arg == name.lower():
-                        self.cx_pairs[name] = self.scraper.get_exchange_trade_pairs(name, self.cx_pairs)
-                        print("#### INFO: Updated trade pairs for '%s'" % name)
-                        break
-                    elif idx + 1 == len(self.cx_names['exchanges']):
-                        print("#### WARNING: No exchange name value '%s' exists in JSON database" % arg)
-
-            self.util.write_json_to_file(self.cx_pairs, self.util.FILE_CXPAIRS)
-
-        # update exchange arbitrage routes file
-        if args[0] == 'routes':
-            data = self.routes.get_arbitrage_routes()
-            self.util.write_json_to_file(data, self.util.FILE_ROUTES)
-            print("#### INFO: Generated arbitrage routes")
-
+        print("#### INFO: Generated arbitrage routes")
         return
 
     def reset_json_data(self):
-        """ reset JSON database files """
-        file_paths = [self.util.FILE_CXPAIRS, self.util.FILE_ROUTES]
-
-        for p in file_paths:
-            self.util.check_path(p)
+        """ reset JSON data files """
+        file_paths = [self.util.FILE_PAIRS, self.util.FILE_ROUTES, self.util.FILE_NAMES, self.util.FILE_PROFIT]
 
         [self.util.write_json_to_file({}, p) for p in file_paths]
 
-        print("#### INFO: JSON databases reset")
-
+        print("#### INFO: JSON data files reset")
         return

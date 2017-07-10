@@ -15,13 +15,11 @@ class App:
 
     def parse_args(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument('--db_create', action='store_true', help='generate new json database')
-        parser.add_argument('--db_update_pairs', action='store', type=str, help='update exchange pairs')
-        parser.add_argument('--db_update_routes', action='store_true', help='update arbitrage routes')
-        parser.add_argument('--db_reset', action='store_true', help='reset to empty json database')
-
+        parser.add_argument('--names', action='store_true', help='generate exchange names')
+        parser.add_argument('--pairs', action='store_true', help='generate trade pairs')
+        parser.add_argument('--routes', action='store_true', help='generate possible arbitrage routes')
+        parser.add_argument('--reset', action='store_true', help='delete all json data files')
         parser.add_argument('--arbitrage', action='store_true', help='calculate arbitrage possibilities')
-
         return parser
 
 
@@ -34,12 +32,11 @@ if __name__ == '__main__':
 
     if app.args['arbitrage']:
         app.arbitrage.start_service()
-    elif app.args['db_create']:
-        app.db.create_json_data()
-    elif app.args['db_reset']:
+    elif app.args['names']:
+        app.db.get_cx_names()
+    elif app.args['pairs']:
+        app.db.create_cx_pairs()
+    elif app.args['routes']:
+        app.db.create_cx_routes()
+    elif app.args['reset']:
         app.db.reset_json_data()
-    else:
-        if app.args['db_update_pairs'] is not None:
-            app.db.update_json_data('pairs', app.args['db_update_pairs'].split(','))
-        if app.args['db_update_routes']:
-            app.db.update_json_data('routes')
