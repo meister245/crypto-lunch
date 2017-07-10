@@ -74,7 +74,7 @@ class TradeRoutes:
                     if (sym_pair[0] in tsym_pair and sym_pair[1] not in tsym_pair):
                         for isym_pair in src_markets:  # intermediary on source exchange
                             if isym_pair != sym_pair and isym_pair != tsym_pair:
-                                if tsym_pair[0] not in fiat and tsym_pair[1] not in fiat: # exclude routes that include fiat transfer between exchanges
+                                if tsym_pair[0] not in fiat or tsym_pair[1] not in fiat: # exclude routes that include fiat transfer between exchanges
                                     self.assign_intermediaries(isym_pair, "target_intermediary", sym_pair, tsym_pair, current_routes)
 
         if len(current_routes) != 0:
