@@ -8,15 +8,15 @@ class Arbitrage:
         self.util = Util()
         self.api = CryptoCompareAPI()
 
-        self.routes = self.util.read_json(self.util.FILE_ROUTES)
-        self.profit_margin = self.util.read_json(self.util.FILE_CONFIG)['profit_margin']
-
         self.valid_routes = {}
         self.profit_routes = {}
         self.price_cache = {}
 
     def start_service(self):
         # assign price to routes, filter routes that contain stale prices
+        self.routes = self.util.read_json(self.util.FILE_ROUTES)
+        self.profit_margin = self.util.read_json(self.util.CONFIG)['profit_margin']
+
         for cx_pair, ar_routes in self.routes.items():
             self.valid_routes[cx_pair] = []
             for idx, route in enumerate(ar_routes):
@@ -90,9 +90,11 @@ class Arbitrage:
 
         elif len(route.keys()) == 8:
             if 'target_intermediary_price' in route:
-                result = self.calc_inter(result, route, route['target_intermediary'], route['target_intermediary_price'])
+                result = self.calc_inter(result, route, route['target_intermediary'],
+                                         route['target_intermediary_price'])
             elif 'source_intermediary_price' in route:
-                result = self.calc_inter(result, route, route['source_intermediary'], route['source_intermediary_price'])
+                result = self.calc_inter(result, route, route['source_intermediary'],
+                                         route['source_intermediary_price'])
 
             if result > 100.0 and (result - 100.0) > float(self.profit_margin):
                 self.store_profitable_route(route, result, cx_pair)
