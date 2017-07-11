@@ -6,6 +6,7 @@ class TradeRoutes:
     def __init__(self):
         self.util = Util()
         self.routes = {}
+        self.fiat = ['USD', 'EUR', 'CNY', 'CAD', 'JPY', 'PLN', 'KRW']
 
     def get_arbitrage_routes(self):
         """ find possible arbitrage routes based on exchange trade pairs """
@@ -49,7 +50,6 @@ class TradeRoutes:
 
         src_markets = self.list_trading_pairs(data, src_exchange)
         trgt_markets = self.list_trading_pairs(data, trgt_exchange)
-        fiat = ['USD', 'EUR', 'CNY', 'CAD']
 
         print("#### INFO: %s - %s" % (src_exchange, trgt_exchange))
         sys.stdout.flush()
@@ -62,20 +62,23 @@ class TradeRoutes:
                     route = self.generate_route(sym_pair, tsym_pair)
                     current_routes.append(route)
 
-                # intermediary trading pair on target exchange to bridge between market trading pairs
-                if sym_pair[0] not in fiat: # exclude fiat arbitrage routes
-                    if (sym_pair[0] in tsym_pair and sym_pair[1] not in tsym_pair):
-                        for itsym_pair in trgt_markets:  # intermediary on target exchange
+                # intermediary trading pair on target exchange:
+                if sym_pair[0] in tsym_pair and sym_pair[1] not in tsym_pair:
+                    # exclude arbitrage routes that require transferring fiat
+                    if sym_pair[0] not in self.fiat and sym_pair[1] not in self.fiat:
+                        for itsym_pair in trgt_markets:
+                            # intermediary and target market pairs cannot match
                             if itsym_pair != tsym_pair and itsym_pair != sym_pair:
-                                if sym_pair[1] not in fiat: # exclude routes that include fiat transfer between exchanges
-                                    self.assign_intermediaries(itsym_pair, "source_intermediary", sym_pair, tsym_pair, current_routes)
+                                self.assign_intermediaries(itsym_pair, "target_intermediary", sym_pair, tsym_pair, current_routes)
 
-                if sym_pair[0] not in fiat:  # exclude fiat arbitrage routes
-                    if (sym_pair[0] in tsym_pair and sym_pair[1] not in tsym_pair):
-                        for isym_pair in src_markets:  # intermediary on source exchange
+                # intermediary trading pair on source exchange:
+                if sym_pair[0] in tsym_pair and sym_pair[1] not in tsym_pair:
+                    # exclude arbitrage routes that require transferring fiat
+                    if sym_pair[0] not in self.fiat and tsym_pair[0] not in self.fiat and tsym_pair[1] not in self.fiat:
+                        for isym_pair in src_markets:
+                            # intermediary and target market pairs cannot match
                             if isym_pair != sym_pair and isym_pair != tsym_pair:
-                                if tsym_pair[0] not in fiat or tsym_pair[1] not in fiat: # exclude routes that include fiat transfer between exchanges
-                                    self.assign_intermediaries(isym_pair, "target_intermediary", sym_pair, tsym_pair, current_routes)
+                                self.assign_intermediaries(isym_pair, "source_intermediary", sym_pair, tsym_pair, current_routes)
 
         if len(current_routes) != 0:
             exchange_pair = src_exchange + "-" + trgt_exchange
