@@ -1,0 +1,12 @@
+{
+  "profit_margin": 1,
+  "excluded": [
+    "LocalBitcoins",
+    "Cryptsy",
+    "CCEDK",
+    "itBit",
+    "Coinse",
+    "Quoine",
+    "Yacuna"
+  ]
+}

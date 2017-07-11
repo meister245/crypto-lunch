@@ -5,7 +5,11 @@ import time
 
 class Util:
     def __init__(self):
-        pass
+        self.CONFIG = 'config.json'
+        self.FILE_NAMES = 'json/cx_names.json'
+        self.FILE_PAIRS = 'json/cx_pairs.json'
+        self.FILE_ROUTES = 'json/cx_routes.json'
+        self.FILE_PROFIT = 'json/cx_profit.json'
 
     @staticmethod
     def read_file(filename):
@@ -14,6 +18,12 @@ class Util:
 
     @staticmethod
     def write_json_to_file(data, filename):
+
+        dirname, file = filename.split('/')
+
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+
         with open(filename, 'w') as f:
             return json.dump(data, f)
 
@@ -24,18 +34,3 @@ class Util:
                 return json.load(f)
         except FileNotFoundError:
             return dict()
-
-    @staticmethod
-    def check_path(p):
-        dirname, filename = p.split('/')
-
-        if not os.path.exists(dirname):
-            os.makedirs(dirname)
-
-        if not os.path.exists(p):
-            with open(p, 'w') as f:
-                return json.dump({}, f)
-
-    @staticmethod
-    def get_current_time():
-        return time.time()
