@@ -19,7 +19,9 @@ class App:
         parser.add_argument('--pairs', action='store_true', help='generate trade pairs')
         parser.add_argument('--routes', action='store_true', help='generate possible arbitrage routes')
         parser.add_argument('--reset', action='store_true', help='delete all json data files')
-        parser.add_argument('--arbitrage', action='store_true', help='calculate arbitrage possibilities')
+        parser.add_argument('--arbitrage_all', action='store_true', help='calculate all arbitrage possibilities')
+        parser.add_argument('--arbitrage_source', action='store', help='calculate all arbitrage if source exchanges(s)', default='')
+        parser.add_argument('--arbitrage_target', action='store', help='calculate all arbitrage if target exchanges(s)', default='')
         return parser
 
 
@@ -30,13 +32,32 @@ if __name__ == '__main__':
         app.parser.print_help()
         exit()
 
-    if app.args['arbitrage']:
+    if app.args['arbitrage_all']:
         app.arbitrage.start_service()
-    elif app.args['names']:
+        exit()
+
+    if len(app.args['arbitrage_source']) != 0:
+        filter = app.args['arbitrage_source'].lower().split(',')
+        app.arbitrage.start_service('source', filter)
+        exit()
+
+    if len(app.args['arbitrage_target']) != 0:
+        filter = app.args['arbitrage_target'].lower().split(',')
+        app.arbitrage.start_service('target', filter)
+        exit()
+
+    if app.args['names']:
         app.db.get_cx_names()
-    elif app.args['pairs']:
+        exit()
+
+    if app.args['pairs']:
         app.db.create_cx_pairs()
-    elif app.args['routes']:
+        exit()
+
+    if app.args['routes']:
         app.db.create_cx_routes()
-    elif app.args['reset']:
+        exit()
+
+    if app.args['reset']:
         app.db.reset_json_data()
+        exit()

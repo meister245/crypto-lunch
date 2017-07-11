@@ -1,3 +1,4 @@
+import sys
 from time import time
 from utilities.helper import Util
 from modules.api.cryptocompare_api import CryptoCompareAPI
@@ -12,19 +13,54 @@ class Arbitrage:
         self.profit_routes = {}
         self.price_cache = {}
 
-    def start_service(self):
+    def start_service(self, filter='all', *args):
         # assign price to routes, filter routes that contain stale prices
         self.routes = self.util.read_json(self.util.FILE_ROUTES)
         self.profit_margin = self.util.read_json(self.util.CONFIG)['profit_margin']
 
+        print("#### INFO: Calculating profitable arbitrage routes")
+        sys.stdout.flush()
+
         for cx_pair, ar_routes in self.routes.items():
-            self.valid_routes[cx_pair] = []
-            for idx, route in enumerate(ar_routes):
-                try:
-                    priced_route = self.assign_prices_to_route(route, idx, cx_pair)
-                    self.valid_routes[cx_pair].append(priced_route)
-                except ValueError:
-                    pass
+            cx_source, cx_target = cx_pair.split('-')
+
+            if filter == 'source':
+                if cx_source.lower() in args[0]:
+                    print("#### INFO: Processing '%s'" % cx_pair)
+                    sys.stdout.flush()
+
+                    self.valid_routes[cx_pair] = []
+                    for idx, route in enumerate(ar_routes):
+                        try:
+                            priced_route = self.assign_prices_to_route(route, idx, cx_pair)
+                            self.valid_routes[cx_pair].append(priced_route)
+                        except ValueError:
+                            pass
+
+            if filter == 'target':
+                if cx_target.lower() in args[0]:
+                    print("#### INFO: Processing '%s'" % cx_pair)
+                    sys.stdout.flush()
+
+                    self.valid_routes[cx_pair] = []
+                    for idx, route in enumerate(ar_routes):
+                        try:
+                            priced_route = self.assign_prices_to_route(route, idx, cx_pair)
+                            self.valid_routes[cx_pair].append(priced_route)
+                        except ValueError:
+                            pass
+
+            if filter == 'all':
+                print("#### INFO: Processing '%s'" % cx_pair)
+                sys.stdout.flush()
+
+                self.valid_routes[cx_pair] = []
+                for idx, route in enumerate(ar_routes):
+                    try:
+                        priced_route = self.assign_prices_to_route(route, idx, cx_pair)
+                        self.valid_routes[cx_pair].append(priced_route)
+                    except ValueError:
+                        pass
 
         # calculate profitable routes
         for cx_pair, ar_routes in self.valid_routes.items():
@@ -32,7 +68,7 @@ class Arbitrage:
             for route in ar_routes:
                 self.calculate_profitability(route, cx_pair)
 
-        # display profitable routes
+        # write profitable routes to file
         self.util.write_json_to_file(self.profit_routes, self.util.FILE_PROFIT)
         print("#### INFO: Profitable arbitrage routes written to file")
 
@@ -70,10 +106,13 @@ class Arbitrage:
             last_update = self.price_cache[cx][pair]['lastupdate']
 
         else:
-            req_data = self.api.get_price_multifull(req_params)['RAW'][fsym][tsym]
-            price = req_data['PRICE']
-            last_update = req_data['LASTUPDATE']
-            self.price_cache[cx][pair] = {"price": price, "lastupdate": last_update}
+            try:
+                req_data = self.api.get_price_multifull(req_params)['RAW'][fsym][tsym]
+                price = req_data['PRICE']
+                last_update = req_data['LASTUPDATE']
+                self.price_cache[cx][pair] = {"price": price, "lastupdate": last_update}
+            except KeyError:
+                raise ValueError
 
         self.check_stale_data(last_update)
 
