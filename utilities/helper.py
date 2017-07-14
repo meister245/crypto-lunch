@@ -1,9 +1,5 @@
 import os
 import json
-import time
-import datetime
-
-ts = datetime.datetime.fromtimestamp(time.time()).strftime('%m%d_%H%M')
 
 
 class Util:
@@ -12,7 +8,7 @@ class Util:
         self.FILE_NAMES = 'json/cx_names.json'
         self.FILE_PAIRS = 'json/cx_pairs.json'
         self.FILE_ROUTES = 'json/cx_routes.json'
-        self.FILE_PROFIT = 'json/cx_profit_' + ts + '.json'
+        self.FILE_PROFIT = 'json/cx_profit.json'
 
     @staticmethod
     def read_file(filename):

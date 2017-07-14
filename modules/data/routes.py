@@ -57,11 +57,6 @@ class TradeRoutes:
         for sym_pair in src_markets:
             for tsym_pair in trgt_markets:
 
-                # matching market trading pairs between exchanges
-                if sym_pair[0] in tsym_pair and sym_pair[1] in tsym_pair:
-                    route = self.generate_route(sym_pair, tsym_pair)
-                    current_routes.append(route)
-
                 # intermediary trading pair on target exchange:
                 if sym_pair[0] in tsym_pair and sym_pair[1] not in tsym_pair:
                     # exclude arbitrage routes that require transferring fiat

@@ -67,6 +67,8 @@ class Arbitrage:
             self.profit_routes[cx_pair] = []
             for route in ar_routes:
                 self.calculate_profitability(route, cx_pair)
+            if len(self.profit_routes[cx_pair]) == 0:
+                del self.profit_routes[cx_pair]
 
         # write profitable routes to file
         self.util.write_json_to_file(self.profit_routes, self.util.FILE_PROFIT)
