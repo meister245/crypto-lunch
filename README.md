@@ -13,8 +13,7 @@ Always verify the results before taking any actions.
 * Python 3.6 required
 * Clone repository
 * Install any required packages
-
-### Options
+* Run the commands in the below order.
 
 `python app.py --names`  
 Retrieve all exchange names and write them to file.
@@ -23,10 +22,12 @@ Retrieve all exchange names and write them to file.
 Retrieve all trading pairs on exchanges and write them to file.
 
 `python app.py --routes`  
-List all possible arbitrage routes between exchanges and write them to file.
+Calculate possible arbitrage routes between exchanges and write them to file.
 
 `python app.py --arbitrage_all`  
 Run calculation on all possible arbitrage routes and write profitable routes to file.
+
+### Optional
 
 `python app.py --arbitrage_source bittrex`  
 `python app.py --arbitrage_source bittrex,poloniex`  
