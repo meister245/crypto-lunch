@@ -37,7 +37,7 @@ Example:
 1) Source exchange is Kraken, where we have X amount of DASH.
 2) Sell DASH for USD, then buy USDT with USD.
 3) Transfer USDT to Liqui exchange, sell USDT for DASH.
-4) You know have 1.883 times more DASH**
+4) You now have 1.883 times more DASH**
 
 ** Exchange fees not included
 
