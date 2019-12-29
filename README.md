@@ -1,60 +1,62 @@
-# CryptoLunch
+crypto-lunch
+------------
 
-Find profitable arbitrage trading routes for altcoins on crypto exchanges.  
-All information is provided by CryptoCompare API.
+Calculate and find high risk arbitrage trading routes for altcoins on cryptocurrency exchanges. Data is fully sourced from CryptoCompare
 
-### Disclaimer
+#### Disclaimer
 
-The calculated profit margin does not take into account the withdraw fees, taker fees or any exchange specific fees.  
-Always verify the results before taking any actions.
+* The calculated profit margin does not take into account the exchange market order book, exchange withdraw fees, taker fees or any other fees associated with the given exchange
+* Any windows of opportunity are likely to be gone under a few minutes
+* Always verify open markets and exchange policies before taking any action at your own risk.
 
-### How to run:
+#### Setup & Usage:
 
-* Python 3.6 required
-* Clone repository
-* Install any required packages
-* Run the commands in the below order.
+* Python 3.7.x required
+* Clone or download repository
+* Install dependency libraries
 
-`python app.py --names`  
-Retrieve all exchange names and write them to file.
 
-`python app.py --pairs`  
-Retrieve all trading pairs on exchanges and write them to file.
+    pip install -r ./requirements.txt
 
-`python app.py --routes`  
-Calculate possible arbitrage routes between exchanges and write them to file.
+#### Demo
 
-`python app.py --arbitrage_all`  
-Run calculation on all possible arbitrage routes and write profitable routes to file.
+    ./bin/arbitrage coinbase bittrex
 
-### Results
+    Coinbase-BitTrex - 152 routes found
+    Coinbase-BitTrex - 42 active routes after validation
+    Coinbase-BitTrex - 4 profitable routes calculated
+    --------------------------------------------------
+    Arbitrage Crypto: BTC - Profit Margin: 3.5 %
+    BTC-ETH (Coinbase) => ETH-STRAT (BitTrex) => BTC-STRAT (BitTrex)
+    --------------------------------------------------
+    Arbitrage Crypto: BTC - Profit Margin: 1.37 %
+    BTC-ETH (Coinbase) => ETH-DMT (BitTrex) => BTC-DMT (BitTrex)
+    --------------------------------------------------
+    Arbitrage Crypto: BTC - Profit Margin: 1.03 %
+    BTC-ETC (Coinbase) => ETH-ETC (BitTrex) => BTC-ETH (BitTrex)
+    --------------------------------------------------
+    Arbitrage Crypto: BTC - Profit Margin: 1.33 %
+    BTC-EOS (Coinbase) => ETH-EOS (BitTrex) => BTC-ETH (BitTrex)
 
-View results in `cx_profit.json` located in the `json` folder.
-
-Example:
-`"Kraken-Liqui": [{"arbitrage_sym": "DASH", "source_market_pair": "DASH-USD", "source_intermediary": "USDT-USD", "target_market_pair": "DASH-USDT", "helper_sym": "USDT", "source_market_price": 294.9, "source_intermediary_price": 0.9989, "target_market_price": 289.76818641, "profit_margin": "1.883"}]`
-
-1) Source exchange is Kraken, where we have X amount of DASH.
-2) Sell DASH for USD, then buy USDT with USD.
-3) Transfer USDT to Liqui exchange, sell USDT for DASH.
-4) You now have 1.883% more DASH**
+**Steps**
+1. Source exchange is Coinbase, where we have X amount of BTC.
+2. Sell BTC for ETH on Coinbase
+3. Transfer ETH from Coinbase to BitTrex
+4. Sell ETH for STRAT on BitTrex
+5. Sell STRAT for BTC on BitTrex
+6. You now have 3.5 % more BTC**
+7. Transfer BTC back to Coinbase and repeat if still profitable
 
 ** Exchange fees not included
 
-### Optional
+**Config**
 
-`python app.py --arbitrage_source bittrex`  
-`python app.py --arbitrage_source bittrex,poloniex`  
-Run calculation on arbitrage routes with designated exchange(s) as source
+There is a configuration file in `./resources/config.yaml`
 
-`python app.py --arbitrage_target bittrex`  
-`python app.py --arbitrage_target bittrex,poloniex`  
-Run calculation on arbitrage routes with designated exchange(s) as target
+`sym_exclude`
 
-### Config
+Exclude market pairs with these symbols from arbitrage route calculation
 
-`profit_margin`  
-Only write arbitrage routes to file, if the achievable profit % is larger than this decimal value.
+`cx_exclude`
 
-`excluded`  
 Exclude these exchanges from arbitrage route calculation
