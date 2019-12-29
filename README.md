@@ -47,7 +47,7 @@ Calculate and find high risk arbitrage trading routes for altcoins on cryptocurr
 6. You now have 3.5 % more BTC**
 7. Transfer BTC back to Coinbase and repeat if still profitable
 
-** Exchange fees not included
+** See disclaimer above
 
 **Config**
 
