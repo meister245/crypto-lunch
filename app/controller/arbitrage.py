@@ -69,10 +69,10 @@ class ArbitrageController(object):
         return route
 
     @classmethod
-    @cachetools.func.ttl_cache(ttl=60)
+    @cachetools.func.ttl_cache(ttl=120)
     def get_market_pair_price(cls, pair, cx_name):
         tsym, fsym = pair.split('-')
-        response = cls.api.get_price_multifull({"fsyms": fsym, "tsyms": tsym, "e": cx_name})
+        response = cls.api.get_price_multi_full(params={"fsyms": fsym, "tsyms": tsym, "e": cx_name})
 
         if not response['RAW'][fsym][tsym]['LASTUPDATE'] + 3600 > int(time.time()):
             raise ValueError('stale market')

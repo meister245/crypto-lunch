@@ -103,8 +103,8 @@ class DataController(object):
         return current_routes
 
     @staticmethod
-    def list_trading_pairs(data, exchange_name):
-        for base_sym, target_syms in data[exchange_name].items():
+    def list_trading_pairs(cx_pairs, exchange_name):
+        for base_sym, target_syms in cx_pairs[exchange_name].items():
             for sym in target_syms:
                 yield tuple([sym, base_sym])
 
