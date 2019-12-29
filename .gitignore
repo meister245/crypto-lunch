@@ -1,6 +1,4 @@
-# folders
 .idea/
-json/
+resources/data/
 
-# file extensions
 *.pyc
