@@ -25,13 +25,13 @@ class ArbitrageController(object):
             for route in routes:
                 try:
                     p_routes.append(cls.get_priced_route(route, cx_pair))
-                    print(f'retrieved prices for {len(p_routes)} routes - {cx_pair}\r', end='')
+                    print(f'{cx_pair} - {len(p_routes)} active routes after validation\r', end='')
 
                 except ValueError:
                     pass
 
             priced_routes.update({cx_pair: p_routes})
-            print(f'retrieved prices for {len(p_routes)} routes - {cx_pair}')
+            print(f'{cx_pair} - {len(p_routes)} active routes after validation')
 
         return priced_routes
 
@@ -45,10 +45,10 @@ class ArbitrageController(object):
             for route in routes:
                 for p_route in cls.calculate_route_profit(route, profit_margin):
                     p_routes.append(p_route)
-                    print(f'calculated {len(p_routes)} profitable routes for {cx_pair}\r', end='')
+                    print(f'{cx_pair} - {len(p_routes)} profitable routes calculated\r', end='')
 
             profit_routes.update({cx_pair: p_routes})
-            print(f'calculated {len(p_routes)} profitable routes for {cx_pair}')
+            print(f'{cx_pair} - {len(p_routes)} profitable routes calculated')
 
         return profit_routes
 

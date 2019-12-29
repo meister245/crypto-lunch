@@ -4,10 +4,9 @@ import shutil
 from os.path import join, isdir, isfile
 
 from .. import RESOURCES_DIR
+from lib.cryptocompare import CryptoCompareAPI
 
 import cachetools.func
-
-from lib.cryptocompare import CryptoCompareAPI
 
 
 class DataController(object):
@@ -15,12 +14,14 @@ class DataController(object):
 
     @classmethod
     @cachetools.func.lfu_cache()
-    def get_cx_names(cls, exclude):
+    def get_cx_names(cls, ex_cx):
+        exclude = [x.lower() for x in ex_cx]
+
         if isdir(join(RESOURCES_DIR, 'data')) and isfile(join(RESOURCES_DIR, 'data', 'cx_names.dat')):
             with open(join(RESOURCES_DIR, 'data', 'cx_names.dat')) as f:
                 return tuple([x for x in f.read().split(',')])
 
-        cx_names = tuple([x for x in cls.api.get_exchange_pairs() if x not in exclude])
+        cx_names = tuple([x for x in cls.api.get_exchange_pairs() if x.lower() not in exclude])
 
         if len(cx_names) > 0:
             cls.write_data_file(cx_names, f_name='cx_names.dat', df='csv')
@@ -29,7 +30,7 @@ class DataController(object):
 
     @classmethod
     @cachetools.func.lfu_cache()
-    def get_cx_pairs(cls, exclude):
+    def get_cx_pairs(cls, ex_cx):
         if isdir(join(RESOURCES_DIR, 'data')) and isfile(join(RESOURCES_DIR, 'data', 'cx_pairs.dat')):
             with open(join(RESOURCES_DIR, 'data', 'cx_pairs.dat')) as f:
                 return json.loads(f.read())
@@ -39,7 +40,7 @@ class DataController(object):
         for cx_name, sym_pairs in cls.api.get_exchange_pairs().items():
             pairs = {}
 
-            if cx_name in exclude:
+            if cx_name in ex_cx:
                 continue
 
             for sym_src, sym_target in sym_pairs.items():
@@ -55,15 +56,15 @@ class DataController(object):
 
     @classmethod
     @cachetools.func.lfu_cache()
-    def get_cx_routes(cls, src_cx, target_cx, exclude=None, sym_fiat=None):
+    def get_cx_routes(cls, src_cx, target_cx, ex_cx, ex_sym):
         f_name = f'{src_cx}-{target_cx}.dat'
 
         if isdir(join(RESOURCES_DIR, 'data', 'cx_routes')) and isfile(join(RESOURCES_DIR, 'data', 'cx_routes', f_name)):
             with open(join(RESOURCES_DIR, 'data', 'cx_routes', f_name)) as f:
                 return json.loads(f.read())
 
-        cx_pairs = cls.get_cx_pairs(exclude=exclude)
-        cx_routes = {f'{src_cx}-{target_cx}': cls.find_routes(cx_pairs, sym_fiat, src_cx, target_cx)}
+        cx_pairs = cls.get_cx_pairs(ex_cx)
+        cx_routes = {f'{src_cx}-{target_cx}': cls.find_routes(cx_pairs, ex_sym, src_cx, target_cx)}
 
         if len(cx_routes) > 0:
             cls.write_data_route_file(cx_routes, f_name)
@@ -71,7 +72,7 @@ class DataController(object):
         return cx_routes
 
     @classmethod
-    def find_routes(cls, cx_pairs, sym_fiat, src_cx, target_cx):
+    def find_routes(cls, cx_pairs, ex_sym, src_cx, target_cx):
         current_routes = []
 
         for src_pair in cls.list_trading_pairs(cx_pairs, src_cx):
@@ -81,24 +82,26 @@ class DataController(object):
 
                 # intermediary trading pair on target exchange:
                 if src_base in target_pair and src_quote not in target_pair:
-                    if src_base not in sym_fiat and src_quote not in sym_fiat:
+                    if src_base not in ex_sym and src_quote not in ex_sym:
                         for inter_pair in cls.list_trading_pairs(cx_pairs, target_cx):
                             if inter_pair != src_pair and inter_pair != target_pair:
                                 for x in cls.find_intermediary_markets(src_pair, target_pair, inter_pair, 'target'):
-                                    print(f'{len(current_routes) + 1} routes - {src_cx} -> {target_cx}\r', end='')
                                     current_routes.append(x)
+
+                print(f'{src_cx}-{target_cx} - {len(current_routes)} routes found\r', end='')
 
                 # intermediary trading pairs on source exchange:
                 if src_base in target_pair and src_quote not in target_pair:
-                    if src_base not in sym_fiat and target_base not in sym_fiat and target_quote not in sym_fiat:
+                    if src_base not in ex_sym and target_base not in ex_sym and target_quote not in ex_sym:
                         for inter_pair in cls.list_trading_pairs(cx_pairs, src_cx):
                             if inter_pair != src_pair and inter_pair != target_pair:
                                 for x in cls.find_intermediary_markets(src_pair, target_pair, inter_pair, 'source'):
-                                    print(f'{len(current_routes) + 1} routes - {src_cx} -> {target_cx}\r', end='')
                                     current_routes.append(x)
 
+                print(f'{src_cx}-{target_cx} - {len(current_routes)} routes found\r', end='')
+
         if len(current_routes) > 0:
-            print(f'{len(current_routes)} routes - {src_cx} -> {target_cx}')
+            print(f'{src_cx}-{target_cx} - {len(current_routes)} routes found')
 
         return current_routes
 
