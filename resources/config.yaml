@@ -6,7 +6,7 @@ cx_exclude:
   - Coinse
   - Quoine
   - Yacuna
-sym_fiat:
+sym_exclude:
   - USD
   - EUR
   - CNY
