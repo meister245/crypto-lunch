@@ -1,0 +1,16 @@
+cx_exclude:
+  - LocalBitcoins
+  - Cryptsy
+  - CCEDK
+  - itBit
+  - Coinse
+  - Quoine
+  - Yacuna
+sym_fiat:
+  - USD
+  - EUR
+  - CNY
+  - CAD
+  - JPY
+  - PLN
+  - KRW
