@@ -14,15 +14,17 @@ def main():
     args = parse_args()
     service = ServiceController()
 
-    service.run_service(source_cx=args.cx_source, target_cx=args.cx_target, refresh=args.refresh)
+    service.run_service(**vars(args))
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('cx_source', action='store', type=str,
+    parser.add_argument('source_cx', action='store', type=str,
                         metavar='SRC_EXCHANGE', help='exchange name')
-    parser.add_argument('cx_target', action='store', type=str,
+    parser.add_argument('target_cx', action='store', type=str,
                         metavar='TARGET_EXCHANGE', help='exchange name')
+    parser.add_argument('--min-profit', action='store', type=float, default=1.0,
+                        metavar='PROFIT_MARIN', help='minimum percent profit')
     parser.add_argument('--refresh', action='store_true', default=False,
                         help='refresh local data files')
 
